@@ -60,7 +60,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
-      <div className="relative w-full max-w-md aspect-square bg-card rounded-2xl overflow-hidden border-2 border-primary/20">
+      <div className="relative w-full max-w-md bg-card rounded-2xl overflow-hidden border-2 border-primary/20" style={{ aspectRatio: '4/3' }}>
         {!isStreaming ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <Button
@@ -78,12 +78,13 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
               ref={videoRef}
               autoPlay
               playsInline
+              muted
               className="w-full h-full object-cover"
             />
             <Button
               onClick={capturePhoto}
               size="lg"
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow z-10"
             >
               Capture Vibe
             </Button>
