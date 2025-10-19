@@ -62,9 +62,16 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-foreground">{entry.name}</p>
                   {entry.vibeAnalysis && (
-                    <p className="text-sm text-muted-foreground italic line-clamp-2">
-                      "{entry.vibeAnalysis}"
-                    </p>
+                    <div className="flex items-start gap-2 mt-1">
+                      <img 
+                        src="/src/assets/vibe-bot.png" 
+                        alt="Vibe Bot" 
+                        className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
+                      />
+                      <p className="text-sm text-muted-foreground italic line-clamp-2 flex-1">
+                        "{entry.vibeAnalysis}"
+                      </p>
+                    </div>
                   )}
                   <p className="text-xs text-muted-foreground/70">
                     {new Date(entry.timestamp).toLocaleDateString()}
