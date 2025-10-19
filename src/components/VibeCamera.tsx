@@ -15,16 +15,23 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
+        video: { 
+          facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
         audio: false,
       });
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Explicitly play the video - critical for mobile
+        await videoRef.current.play();
         setIsStreaming(true);
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
+      alert("Unable to access camera. Please check permissions.");
     }
   };
 
