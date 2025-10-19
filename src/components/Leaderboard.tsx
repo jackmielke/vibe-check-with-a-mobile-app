@@ -43,29 +43,34 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
             sortedEntries.map((entry, index) => (
               <div
                 key={`${entry.name}-${entry.timestamp}`}
-                className="flex items-center gap-4 bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-colors"
+                className="flex items-center gap-4 bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
+                onClick={() => entry.imageUrl && setSelectedEntry({
+                  imageUrl: entry.imageUrl!,
+                  name: entry.name,
+                  score: entry.score,
+                  analysis: entry.vibeAnalysis || "No analysis available"
+                })}
               >
                 <div className="w-12 flex justify-center">{getMedalIcon(index)}</div>
                 {entry.imageUrl && (
                   <img
                     src={entry.imageUrl}
                     alt={`${entry.name}'s vibe`}
-                    className="w-16 h-16 rounded-lg object-cover border border-primary/20 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedEntry({
-                      imageUrl: entry.imageUrl!,
-                      name: entry.name,
-                      score: entry.score,
-                      analysis: entry.vibeAnalysis || "No analysis available"
-                    })}
+                    className="w-16 h-16 rounded-lg object-cover border border-primary/20"
                   />
                 )}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="font-semibold text-foreground">{entry.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  {entry.vibeAnalysis && (
+                    <p className="text-sm text-muted-foreground italic line-clamp-2">
+                      "{entry.vibeAnalysis}"
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground/70">
                     {new Date(entry.timestamp).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="text-2xl font-bold text-primary">{entry.score}</div>
+                <div className="text-2xl font-bold text-primary shrink-0">{entry.score}</div>
               </div>
             ))
           )}
