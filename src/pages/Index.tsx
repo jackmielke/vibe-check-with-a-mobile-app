@@ -4,6 +4,7 @@ import { VibeCamera } from "@/components/VibeCamera";
 import { VibeScore } from "@/components/VibeScore";
 import { Leaderboard } from "@/components/Leaderboard";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Screen = "welcome" | "camera" | "score" | "leaderboard";
 
@@ -21,13 +22,34 @@ const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
-  // Load leaderboard from localStorage on mount
+  // Load leaderboard from database on mount
   useEffect(() => {
-    const saved = localStorage.getItem("vibeCheckLeaderboard");
-    if (saved) {
-      setLeaderboard(JSON.parse(saved));
-    }
+    loadLeaderboard();
   }, []);
+
+  const loadLeaderboard = async () => {
+    const { data, error } = await supabase
+      .from("leaderboard")
+      .select("*")
+      .order("score", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.error("Error loading leaderboard:", error);
+      toast.error("Failed to load leaderboard");
+      return;
+    }
+
+    if (data) {
+      const entries: LeaderboardEntry[] = data.map((entry) => ({
+        name: entry.name,
+        score: entry.score,
+        timestamp: entry.created_at,
+      }));
+      setLeaderboard(entries);
+    }
+  };
 
   const handleCapture = async (imageData: string) => {
     setCapturedImage(imageData);
@@ -62,18 +84,23 @@ const Index = () => {
     }
   };
 
-  const handleSubmitToLeaderboard = (name: string) => {
-    const newEntry: LeaderboardEntry = {
-      name,
-      score: vibeScore,
-      timestamp: new Date().toISOString(),
-    };
+  const handleSubmitToLeaderboard = async (name: string) => {
+    const { error } = await supabase
+      .from("leaderboard")
+      .insert({
+        name,
+        score: vibeScore,
+        vibe_analysis: vibeAnalysis,
+      });
 
-    const updatedLeaderboard = [...leaderboard, newEntry];
-    setLeaderboard(updatedLeaderboard);
-    localStorage.setItem("vibeCheckLeaderboard", JSON.stringify(updatedLeaderboard));
+    if (error) {
+      console.error("Error adding to leaderboard:", error);
+      toast.error("Failed to add to leaderboard");
+      return;
+    }
 
     toast.success("Added to leaderboard!");
+    await loadLeaderboard();
     setScreen("leaderboard");
   };
 
