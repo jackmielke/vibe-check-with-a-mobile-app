@@ -52,25 +52,26 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
   return (
     <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
       {imageUrl && (
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md relative">
           <img
             src={imageUrl}
             alt="Your vibe check"
             className="w-full h-auto rounded-xl border-2 border-primary/30 shadow-glow"
           />
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-background/90 via-background/50 to-transparent rounded-xl">
+            <div className="text-center space-y-2">
+              <div className="text-6xl md:text-8xl animate-scale-in">{getVibeEmoji(score)}</div>
+              <div className="relative">
+                <h2 className="text-5xl md:text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-pulse-glow">
+                  {displayScore}
+                </h2>
+                <Sparkles className="absolute -top-2 -right-6 md:-right-8 h-5 w-5 md:h-6 md:w-6 text-secondary animate-pulse" />
+              </div>
+              <p className="text-lg md:text-xl text-muted-foreground font-semibold">Vibe Score</p>
+            </div>
+          </div>
         </div>
       )}
-      
-      <div className="text-center space-y-2">
-        <div className="text-8xl animate-scale-in">{getVibeEmoji(score)}</div>
-        <div className="relative">
-          <h2 className="text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-pulse-glow">
-            {displayScore}
-          </h2>
-          <Sparkles className="absolute -top-2 -right-8 h-6 w-6 text-secondary animate-pulse" />
-        </div>
-        <p className="text-xl text-muted-foreground">Vibe Score</p>
-      </div>
 
       <div className="w-full max-w-md bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-primary/20">
         <p className="text-foreground/90 text-center leading-relaxed">{analysis}</p>
