@@ -62,16 +62,9 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-foreground">{entry.name}</p>
                   {entry.vibeAnalysis && (
-                    <div className="flex items-start gap-2 mt-1">
-                      <img 
-                        src="/src/assets/vibe-bot.png" 
-                        alt="Vibe Bot" 
-                        className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
-                      />
-                      <p className="text-sm text-muted-foreground italic line-clamp-2 flex-1">
-                        "{entry.vibeAnalysis}"
-                      </p>
-                    </div>
+                    <p className="text-sm text-muted-foreground italic line-clamp-2">
+                      "{entry.vibeAnalysis}"
+                    </p>
                   )}
                   <p className="text-xs text-muted-foreground/70">
                     {new Date(entry.timestamp).toLocaleDateString()}
@@ -107,7 +100,14 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
                   <span className="text-3xl font-bold text-primary">{selectedEntry.score}</span>
                 </div>
                 <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-primary/20">
-                  <p className="text-foreground/90 leading-relaxed">{selectedEntry.analysis}</p>
+                  <div className="flex items-start gap-3">
+                    <img 
+                      src="/src/assets/vibe-bot.png" 
+                      alt="Vibe Bot" 
+                      className="w-8 h-8 rounded-full object-cover shrink-0 mt-1"
+                    />
+                    <p className="text-foreground/90 leading-relaxed flex-1">{selectedEntry.analysis}</p>
+                  </div>
                 </div>
               </div>
             </div>
