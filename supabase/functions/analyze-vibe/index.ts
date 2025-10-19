@@ -38,7 +38,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a hilarious vibe checker. Analyze photos and give a vibe score from 0-100 with a funny, sarcastic analysis. Be playful, witty, and roast them a little. Keep it under 30 words.'
+            content: 'You are a hilarious vibe checker. Analyze photos and give a precise vibe score from 0-100 (use decimals and any number in the range) with a funny, sarcastic analysis. Be creative with scores - use the full range and be specific. Be playful, witty, and roast them a little. Keep it under 30 words.'
           },
           {
             role: 'user',
@@ -67,7 +67,7 @@ serve(async (req) => {
                 properties: {
                   score: {
                     type: 'number',
-                    description: 'Vibe score from 0 to 100'
+                    description: 'Precise vibe score from 0 to 100. Use decimals and any value in the range (e.g., 42.7, 88.3, 13.5). Be creative and specific with the score.'
                   },
                   analysis: {
                     type: 'string',
