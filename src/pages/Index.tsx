@@ -13,6 +13,7 @@ interface LeaderboardEntry {
   score: number;
   timestamp: string;
   imageUrl?: string;
+  vibeAnalysis?: string;
 }
 
 const Index = () => {
@@ -48,6 +49,7 @@ const Index = () => {
         score: entry.score,
         timestamp: entry.created_at,
         imageUrl: entry.image_url || undefined,
+        vibeAnalysis: entry.vibe_analysis || undefined,
       }));
       setLeaderboard(entries);
     }

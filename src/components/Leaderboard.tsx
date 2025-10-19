@@ -8,6 +8,7 @@ interface LeaderboardEntry {
   score: number;
   timestamp: string;
   imageUrl?: string;
+  vibeAnalysis?: string;
 }
 
 interface LeaderboardProps {
@@ -16,7 +17,7 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string } | null>(null);
   const sortedEntries = [...entries].sort((a, b) => b.score - a.score).slice(0, 10);
 
   const getMedalIcon = (index: number) => {
@@ -50,7 +51,12 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
                     src={entry.imageUrl}
                     alt={`${entry.name}'s vibe`}
                     className="w-16 h-16 rounded-lg object-cover border border-primary/20 cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedImage(entry.imageUrl!)}
+                    onClick={() => setSelectedEntry({
+                      imageUrl: entry.imageUrl!,
+                      name: entry.name,
+                      score: entry.score,
+                      analysis: entry.vibeAnalysis || "No analysis available"
+                    })}
                   />
                 )}
                 <div className="flex-1">
@@ -74,14 +80,25 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
         </Button>
       </div>
 
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-transparent border-none">
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Full size vibe check"
-              className="w-full h-auto rounded-lg"
-            />
+      <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
+        <DialogContent className="max-w-3xl overflow-hidden">
+          {selectedEntry && (
+            <div className="flex flex-col gap-4">
+              <img
+                src={selectedEntry.imageUrl}
+                alt="Full size vibe check"
+                className="w-full h-auto rounded-lg"
+              />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-bold text-foreground">{selectedEntry.name}</h3>
+                  <span className="text-3xl font-bold text-primary">{selectedEntry.score}</span>
+                </div>
+                <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-primary/20">
+                  <p className="text-foreground/90 leading-relaxed">{selectedEntry.analysis}</p>
+                </div>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
