@@ -12,6 +12,7 @@ interface LeaderboardEntry {
   name: string;
   score: number;
   timestamp: string;
+  imageUrl?: string;
 }
 
 const Index = () => {
@@ -46,6 +47,7 @@ const Index = () => {
         name: entry.name,
         score: entry.score,
         timestamp: entry.created_at,
+        imageUrl: entry.image_url || undefined,
       }));
       setLeaderboard(entries);
     }
@@ -79,18 +81,52 @@ const Index = () => {
     } catch (error) {
       console.error("Error analyzing vibe:", error);
       toast.error(error instanceof Error ? error.message : "Failed to analyze vibe. Please try again.");
+      setCapturedImage(null);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const handleSubmitToLeaderboard = async (name: string) => {
+    let imageUrl: string | null = null;
+
+    // Upload the photo to Supabase storage
+    if (capturedImage) {
+      try {
+        const base64Data = capturedImage.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('vibe-photos')
+          .upload(fileName, blob);
+
+        if (uploadError) {
+          console.error("Error uploading photo:", uploadError);
+        } else if (uploadData) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('vibe-photos')
+            .getPublicUrl(fileName);
+          imageUrl = publicUrl;
+        }
+      } catch (error) {
+        console.error("Error processing photo:", error);
+      }
+    }
+
     const { error } = await supabase
       .from("leaderboard")
       .insert({
         name,
         score: vibeScore,
         vibe_analysis: vibeAnalysis,
+        image_url: imageUrl,
       });
 
     if (error) {
@@ -171,6 +207,7 @@ const Index = () => {
           <VibeScore
             score={vibeScore}
             analysis={vibeAnalysis}
+            imageUrl={capturedImage}
             onSubmit={handleSubmitToLeaderboard}
             onRetry={handleRetry}
           />

@@ -6,11 +6,12 @@ import { Sparkles } from "lucide-react";
 interface VibeScoreProps {
   score: number;
   analysis: string;
+  imageUrl: string | null;
   onSubmit: (name: string) => void;
   onRetry: () => void;
 }
 
-export const VibeScore = ({ score, analysis, onSubmit, onRetry }: VibeScoreProps) => {
+export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: VibeScoreProps) => {
   const [name, setName] = useState("");
   const [displayScore, setDisplayScore] = useState(0);
 
@@ -50,6 +51,16 @@ export const VibeScore = ({ score, analysis, onSubmit, onRetry }: VibeScoreProps
 
   return (
     <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
+      {imageUrl && (
+        <div className="w-full max-w-md">
+          <img
+            src={imageUrl}
+            alt="Your vibe check"
+            className="w-full h-auto rounded-xl border-2 border-primary/30 shadow-glow"
+          />
+        </div>
+      )}
+      
       <div className="text-center space-y-2">
         <div className="text-8xl animate-scale-in">{getVibeEmoji(score)}</div>
         <div className="relative">

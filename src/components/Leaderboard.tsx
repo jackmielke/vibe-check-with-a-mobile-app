@@ -5,6 +5,7 @@ interface LeaderboardEntry {
   name: string;
   score: number;
   timestamp: string;
+  imageUrl?: string;
 }
 
 interface LeaderboardProps {
@@ -40,6 +41,13 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
               className="flex items-center gap-4 bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-colors"
             >
               <div className="w-12 flex justify-center">{getMedalIcon(index)}</div>
+              {entry.imageUrl && (
+                <img
+                  src={entry.imageUrl}
+                  alt={`${entry.name}'s vibe`}
+                  className="w-16 h-16 rounded-lg object-cover border border-primary/20"
+                />
+              )}
               <div className="flex-1">
                 <p className="font-semibold text-foreground">{entry.name}</p>
                 <p className="text-sm text-muted-foreground">
