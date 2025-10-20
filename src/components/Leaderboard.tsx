@@ -18,7 +18,7 @@ interface LeaderboardProps {
 
 export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string } | null>(null);
-  const sortedEntries = [...entries].sort((a, b) => b.score - a.score).slice(0, 10);
+  const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
 
   const getMedalIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
