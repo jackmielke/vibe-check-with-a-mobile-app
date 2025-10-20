@@ -21,13 +21,24 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         audio: false,
         video: {
           facingMode: { ideal: mode },
-          width: { ideal: window.innerWidth },
-          height: { ideal: window.innerHeight }
+          aspectRatio: { ideal: 0.5625 }, // 9:16 for portrait
         }
       });
       return stream;
     } catch (error) {
       console.warn("Failed with facingMode constraint:", error);
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          aspectRatio: { ideal: 0.5625 }
+        }
+      });
+      return stream;
+    } catch (error) {
+      console.warn("Failed with aspect ratio:", error);
     }
 
     try {
@@ -151,40 +162,52 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
-      />
+    <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ 
+      position: 'fixed',
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden'
+    }}>
+      <div className="relative w-full h-full">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 w-full h-full"
+          style={{ 
+            objectFit: 'cover',
+            transform: facingMode === "user" ? "scaleX(-1)" : "none"
+          }}
+        />
+      </div>
       
       {isStreaming && (
         <>
-          {/* Top controls */}
-          <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-background/80 to-transparent z-10">
-            <div className="flex justify-between items-center">
+          {/* Top bar */}
+          <div className="absolute top-0 left-0 right-0 z-20 safe-top">
+            <div className="flex justify-between items-center p-4">
+              <div className="w-10" /> {/* Spacer for symmetry */}
               <Button
                 onClick={flipCamera}
                 size="icon"
                 variant="ghost"
-                className="bg-background/50 backdrop-blur-sm hover:bg-background/70"
+                className="bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white border-none rounded-full"
               >
-                <RefreshCw className="h-5 w-5" />
+                <RefreshCw className="h-6 w-6" />
               </Button>
             </div>
           </div>
 
-          {/* Bottom capture button */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-background/80 to-transparent z-10">
-            <div className="flex justify-center">
+          {/* Bottom capture area */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 pb-8 safe-bottom">
+            <div className="flex justify-center items-center">
               <button
                 onClick={capturePhoto}
-                className="w-20 h-20 rounded-full border-4 border-primary-foreground bg-gradient-primary hover:scale-110 transition-transform shadow-glow flex items-center justify-center"
+                className="relative w-20 h-20 rounded-full border-[6px] border-white bg-transparent hover:scale-95 transition-transform active:scale-90"
+                aria-label="Capture photo"
               >
-                <div className="w-16 h-16 rounded-full bg-primary-foreground"></div>
+                <div className="absolute inset-2 rounded-full bg-white"></div>
               </button>
             </div>
           </div>
@@ -192,10 +215,10 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
       )}
 
       {!isStreaming && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
-            <p className="text-xl text-muted-foreground">Starting camera...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto mb-4"></div>
+            <p className="text-xl text-white">Starting camera...</p>
           </div>
         </div>
       )}
