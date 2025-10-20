@@ -1,20 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import vibeBotImage from "@/assets/vibe-bot.png";
 import { VibeCamera } from "@/components/VibeCamera";
 import { VibeScore } from "@/components/VibeScore";
-import { Leaderboard } from "@/components/Leaderboard";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
-type Screen = "welcome" | "camera" | "score" | "leaderboard";
-
-interface LeaderboardEntry {
-  name: string;
-  score: number;
-  timestamp: string;
-  imageUrl?: string;
-  vibeAnalysis?: string;
-}
+type Screen = "welcome" | "camera" | "score";
 
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("welcome");
@@ -22,38 +14,7 @@ const Index = () => {
   const [vibeScore, setVibeScore] = useState<number>(0);
   const [vibeAnalysis, setVibeAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-
-  // Load leaderboard from database on mount
-  useEffect(() => {
-    loadLeaderboard();
-  }, []);
-
-  const loadLeaderboard = async () => {
-    const { data, error } = await supabase
-      .from("leaderboard")
-      .select("*")
-      .order("score", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(100);
-
-    if (error) {
-      console.error("Error loading leaderboard:", error);
-      toast.error("Failed to load leaderboard");
-      return;
-    }
-
-    if (data) {
-      const entries: LeaderboardEntry[] = data.map((entry) => ({
-        name: entry.name,
-        score: entry.score,
-        timestamp: entry.created_at,
-        imageUrl: entry.image_url || undefined,
-        vibeAnalysis: entry.vibe_analysis || undefined,
-      }));
-      setLeaderboard(entries);
-    }
-  };
+  const navigate = useNavigate();
 
   const handleCapture = async (imageData: string) => {
     setCapturedImage(imageData);
@@ -139,8 +100,7 @@ const Index = () => {
       }
 
       toast.success("Added to leaderboard!");
-      await loadLeaderboard();
-      setScreen("leaderboard");
+      navigate("/leaderboard");
     } catch (error) {
       console.error("Error in handleSubmitToLeaderboard:", error);
       toast.error("Failed to submit to leaderboard");
@@ -182,12 +142,20 @@ const Index = () => {
                 Let me get your Vibe Check
               </p>
             </div>
-            <button
-              onClick={() => setScreen("camera")}
-              className="text-xl px-8 py-4 bg-gradient-primary hover:opacity-90 transition-all rounded-full font-semibold text-primary-foreground shadow-strong hover:shadow-glow hover:scale-105"
-            >
-              Start Vibe Check
-            </button>
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => setScreen("camera")}
+                className="text-xl px-8 py-4 bg-gradient-primary hover:opacity-90 transition-all rounded-full font-semibold text-primary-foreground shadow-strong hover:shadow-glow hover:scale-105"
+              >
+                Start Vibe Check
+              </button>
+              <button
+                onClick={() => navigate("/leaderboard")}
+                className="text-lg px-6 py-3 bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all rounded-full font-semibold text-foreground hover:scale-105"
+              >
+                View Leaderboard
+              </button>
+            </div>
           </div>
         )}
 
@@ -218,10 +186,6 @@ const Index = () => {
             onSubmit={handleSubmitToLeaderboard}
             onRetry={handleRetry}
           />
-        )}
-
-        {screen === "leaderboard" && (
-          <Leaderboard entries={leaderboard} onBackToStart={handleBackToStart} />
         )}
       </div>
     </div>
