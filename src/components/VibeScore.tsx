@@ -42,10 +42,14 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
     return "💀";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onSubmit(name.trim());
+      // Disable the form to prevent double submission
+      const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitButton) submitButton.disabled = true;
+      
+      await onSubmit(name.trim());
     }
   };
 

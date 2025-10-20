@@ -90,56 +90,61 @@ const Index = () => {
   };
 
   const handleSubmitToLeaderboard = async (name: string) => {
-    let imageUrl: string | null = null;
+    try {
+      let imageUrl: string | null = null;
 
-    // Upload the photo to Supabase storage
-    if (capturedImage) {
-      try {
-        const base64Data = capturedImage.split(',')[1];
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      // Upload the photo to Supabase storage
+      if (capturedImage) {
+        try {
+          const base64Data = capturedImage.split(',')[1];
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'image/jpeg' });
 
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('vibe-photos')
-          .upload(fileName, blob);
-
-        if (uploadError) {
-          console.error("Error uploading photo:", uploadError);
-        } else if (uploadData) {
-          const { data: { publicUrl } } = supabase.storage
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+          const { data: uploadData, error: uploadError } = await supabase.storage
             .from('vibe-photos')
-            .getPublicUrl(fileName);
-          imageUrl = publicUrl;
+            .upload(fileName, blob);
+
+          if (uploadError) {
+            console.error("Error uploading photo:", uploadError);
+          } else if (uploadData) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('vibe-photos')
+              .getPublicUrl(fileName);
+            imageUrl = publicUrl;
+          }
+        } catch (error) {
+          console.error("Error processing photo:", error);
         }
-      } catch (error) {
-        console.error("Error processing photo:", error);
       }
+
+      const { error } = await supabase
+        .from("leaderboard")
+        .insert({
+          name,
+          score: vibeScore,
+          vibe_analysis: vibeAnalysis,
+          image_url: imageUrl,
+        });
+
+      if (error) {
+        console.error("Error adding to leaderboard:", error);
+        toast.error("Failed to add to leaderboard");
+        return;
+      }
+
+      toast.success("Added to leaderboard!");
+      await loadLeaderboard();
+      setScreen("leaderboard");
+    } catch (error) {
+      console.error("Error in handleSubmitToLeaderboard:", error);
+      toast.error("Failed to submit to leaderboard");
     }
-
-    const { error } = await supabase
-      .from("leaderboard")
-      .insert({
-        name,
-        score: vibeScore,
-        vibe_analysis: vibeAnalysis,
-        image_url: imageUrl,
-      });
-
-    if (error) {
-      console.error("Error adding to leaderboard:", error);
-      toast.error("Failed to add to leaderboard");
-      return;
-    }
-
-    toast.success("Added to leaderboard!");
-    await loadLeaderboard();
-    setScreen("leaderboard");
   };
 
   const handleRetry = () => {
