@@ -2,6 +2,7 @@ import { Trophy, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
+import vibeBotImage from "@/assets/vibe-bot.png";
 
 interface LeaderboardEntry {
   name: string;
@@ -86,13 +87,13 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
       </div>
 
       <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
-        <DialogContent className="max-w-3xl overflow-hidden">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {selectedEntry && (
             <div className="flex flex-col gap-4">
               <img
                 src={selectedEntry.imageUrl}
                 alt="Full size vibe check"
-                className="w-full h-auto rounded-lg"
+                className="w-full max-h-[50vh] object-contain rounded-lg"
               />
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -102,7 +103,7 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
                 <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-primary/20">
                   <div className="flex items-start gap-3">
                     <img 
-                      src="/src/assets/vibe-bot.png" 
+                      src={vibeBotImage} 
                       alt="Vibe Bot" 
                       className="w-8 h-8 rounded-full object-cover shrink-0 mt-1"
                     />
