@@ -16,31 +16,33 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const { toast } = useToast();
 
   const getStreamWithFallbacks = async (mode: "user" | "environment"): Promise<MediaStream | null> => {
+    // Try with high quality settings but no aspect ratio forcing
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
           facingMode: { ideal: mode },
-          aspectRatio: { ideal: 0.5625 }, // 9:16 for portrait
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         }
       });
       return stream;
     } catch (error) {
-      console.warn("Failed with facingMode constraint:", error);
+      console.warn("Failed with ideal resolution:", error);
     }
 
+    // Try with just facingMode
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: {
-          aspectRatio: { ideal: 0.5625 }
-        }
+        video: { facingMode: { ideal: mode } }
       });
       return stream;
     } catch (error) {
-      console.warn("Failed with aspect ratio:", error);
+      console.warn("Failed with facingMode:", error);
     }
 
+    // Final fallback - any camera
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
