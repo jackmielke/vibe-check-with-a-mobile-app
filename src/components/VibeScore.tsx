@@ -54,7 +54,7 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
+    <div className="flex flex-col items-center gap-6 w-full animate-slide-up pb-8">
       {imageUrl && (
         <div className="w-full max-w-md relative">
           <img

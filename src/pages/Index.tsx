@@ -122,11 +122,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className={`min-h-screen bg-background p-4 relative overflow-hidden ${screen === "score" ? "overflow-y-auto" : "flex items-center justify-center"}`}>
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl animate-pulse-glow" />
       
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className={`relative z-10 w-full max-w-2xl ${screen === "score" ? "py-8" : ""}`}>
         {screen === "welcome" && (
           <div className="flex flex-col items-center gap-8 animate-scale-in">
             <img
