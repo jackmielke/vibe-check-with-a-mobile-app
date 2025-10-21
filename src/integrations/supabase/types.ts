@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           id: string
           leaderboard_entry_id: string
+          user_id: string | null
         }
         Insert: {
           comment_text: string
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           id?: string
           leaderboard_entry_id: string
+          user_id?: string | null
         }
         Update: {
           comment_text?: string
@@ -35,6 +37,7 @@ export type Database = {
           created_at?: string
           id?: string
           leaderboard_entry_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
