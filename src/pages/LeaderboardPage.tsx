@@ -51,11 +51,13 @@ const LeaderboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl animate-pulse-glow" />
+    <div className="fixed inset-0 bg-background overflow-y-auto">
+      <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl animate-pulse-glow pointer-events-none" />
       
-      <div className="relative z-10 w-full max-w-2xl">
-        <Leaderboard entries={leaderboard} onBackToStart={handleBackToStart} />
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 py-8">
+        <div className="w-full max-w-2xl">
+          <Leaderboard entries={leaderboard} onBackToStart={handleBackToStart} />
+        </div>
       </div>
     </div>
   );
