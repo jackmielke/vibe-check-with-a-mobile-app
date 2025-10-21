@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          comment_text: string
+          commenter_name: string | null
+          created_at: string
+          id: string
+          leaderboard_entry_id: string
+        }
+        Insert: {
+          comment_text: string
+          commenter_name?: string | null
+          created_at?: string
+          id?: string
+          leaderboard_entry_id: string
+        }
+        Update: {
+          comment_text?: string
+          commenter_name?: string | null
+          created_at?: string
+          id?: string
+          leaderboard_entry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_leaderboard_entry_id_fkey"
+            columns: ["leaderboard_entry_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboard: {
         Row: {
           created_at: string

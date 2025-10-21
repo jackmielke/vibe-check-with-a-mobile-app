@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 interface LeaderboardEntry {
+  id: string;
   name: string;
   score: number;
   timestamp: string;
@@ -39,6 +40,7 @@ const LeaderboardPage = () => {
 
     if (data) {
       const entries: LeaderboardEntry[] = data.map((entry) => ({
+        id: entry.id,
         name: entry.name,
         score: entry.score,
         timestamp: entry.created_at,

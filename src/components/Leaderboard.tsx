@@ -1,11 +1,17 @@
-import { Trophy, Medal } from "lucide-react";
+import { Trophy, Medal, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import vibeBotImage from "@/assets/vibe-bot.png";
 
 interface LeaderboardEntry {
+  id: string;
   name: string;
   score: number;
   timestamp: string;
@@ -20,7 +26,12 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProps) => {
-  const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string } | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string; entryId: string } | null>(null);
+  const [comments, setComments] = useState<Array<{ id: string; comment_text: string; commenter_name: string | null; created_at: string }>>([]);
+  const [newComment, setNewComment] = useState("");
+  const [commenterName, setCommenterName] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
   const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
 
   const getMedalIcon = (index: number) => {
@@ -29,6 +40,53 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
     if (index === 2) return <Medal className="h-6 w-6 text-amber-600" />;
     return <span className="text-muted-foreground font-bold">#{index + 1}</span>;
   };
+
+  const loadComments = async (entryId: string) => {
+    setLoadingComments(true);
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("leaderboard_entry_id", entryId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading comments:", error);
+      toast({ title: "Failed to load comments", variant: "destructive" });
+    } else {
+      setComments(data || []);
+    }
+    setLoadingComments(false);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim() || !selectedEntry) return;
+
+    setSubmittingComment(true);
+    const { error } = await supabase
+      .from("comments")
+      .insert({
+        leaderboard_entry_id: selectedEntry.entryId,
+        comment_text: newComment.trim(),
+        commenter_name: commenterName.trim() || null,
+      });
+
+    if (error) {
+      console.error("Error submitting comment:", error);
+      toast({ title: "Failed to submit comment", variant: "destructive" });
+    } else {
+      toast({ title: "Comment added!" });
+      setNewComment("");
+      setCommenterName("");
+      await loadComments(selectedEntry.entryId);
+    }
+    setSubmittingComment(false);
+  };
+
+  useEffect(() => {
+    if (selectedEntry) {
+      loadComments(selectedEntry.entryId);
+    }
+  }, [selectedEntry]);
 
   return (
     <>
@@ -64,12 +122,18 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
               <div
                 key={`${entry.name}-${entry.timestamp}`}
                 className="flex items-center gap-4 bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
-                onClick={() => entry.imageUrl && setSelectedEntry({
-                  imageUrl: entry.imageUrl!,
-                  name: entry.name,
-                  score: entry.score,
-                  analysis: entry.vibeAnalysis || "No analysis available"
-                })}
+                onClick={() => {
+                  if (entry.imageUrl) {
+                    const leaderboardEntry = entries.find(e => e.name === entry.name && e.timestamp === entry.timestamp);
+                    setSelectedEntry({
+                      imageUrl: entry.imageUrl!,
+                      name: entry.name,
+                      score: entry.score,
+                      analysis: entry.vibeAnalysis || "No analysis available",
+                      entryId: leaderboardEntry?.id || ""
+                    });
+                  }
+                }}
               >
                 <div className="w-12 flex justify-center">{getMedalIcon(index)}</div>
                 {entry.imageUrl && (
@@ -108,7 +172,7 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
       <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {selectedEntry && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               <img
                 src={selectedEntry.imageUrl}
                 alt="Full size vibe check"
@@ -128,6 +192,75 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
                     />
                     <p className="text-foreground/90 leading-relaxed flex-1">{selectedEntry.analysis}</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Comments Section */}
+              <div className="space-y-4 border-t border-primary/20 pt-4">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                  <h4 className="text-lg font-semibold text-foreground">Comments</h4>
+                </div>
+
+                {/* Comment Form */}
+                <div className="space-y-3 bg-card/30 rounded-lg p-4 border border-primary/10">
+                  <div className="space-y-2">
+                    <Label htmlFor="comment">Add a comment</Label>
+                    <Textarea
+                      id="comment"
+                      placeholder="Share your thoughts..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Your name (optional)</Label>
+                    <Input
+                      id="name"
+                      placeholder="Anonymous"
+                      value={commenterName}
+                      onChange={(e) => setCommenterName(e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSubmitComment}
+                    disabled={!newComment.trim() || submittingComment}
+                    className="w-full"
+                  >
+                    {submittingComment ? "Posting..." : "Post Comment"}
+                  </Button>
+                </div>
+
+                {/* Comments List */}
+                <div className="space-y-3">
+                  {loadingComments ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-20 w-full" />
+                      <Skeleton className="h-20 w-full" />
+                    </div>
+                  ) : comments.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">
+                      No comments yet. Be the first to comment!
+                    </p>
+                  ) : (
+                    comments.map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="bg-card/30 rounded-lg p-4 border border-primary/10 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-foreground">
+                            {comment.commenter_name || "Anonymous"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-foreground/90">{comment.comment_text}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
