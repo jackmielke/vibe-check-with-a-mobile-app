@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, RefreshCw, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VibeCameraProps {
   onCapture: (imageData: string) => void;
@@ -14,21 +15,22 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
-  const getStreamWithFallbacks = async (mode: "user" | "environment"): Promise<MediaStream | null> => {
-    // Try with high quality settings but no aspect ratio forcing
+  const getStreamWithFallbacks = async (mode: "user" | "environment", mobile: boolean): Promise<MediaStream | null> => {
+    // Try with device-specific ideal resolution
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
           facingMode: { ideal: mode },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: mobile ? 720 : 1920 },
+          height: { ideal: mobile ? 1280 : 1080 }
         }
       });
       return stream;
     } catch (error) {
-      console.warn("Failed with ideal resolution:", error);
+      console.warn("Failed with device-specific resolution:", error);
     }
 
     // Try with just facingMode
@@ -59,7 +61,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
     setShowPermissionPrompt(false);
     
     try {
-      const stream = await getStreamWithFallbacks(facingMode);
+      const stream = await getStreamWithFallbacks(facingMode, isMobile);
       
       if (!stream || !videoRef.current) {
         throw new Error("Failed to get camera stream");
