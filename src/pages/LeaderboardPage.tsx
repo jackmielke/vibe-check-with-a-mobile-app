@@ -14,6 +14,7 @@ interface LeaderboardEntry {
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const LeaderboardPage = () => {
   }, []);
 
   const loadLeaderboard = async () => {
+    setLoading(true);
     const { data, error } = await supabase
       .from("leaderboard")
       .select("*")
@@ -31,6 +33,7 @@ const LeaderboardPage = () => {
     if (error) {
       console.error("Error loading leaderboard:", error);
       toast.error("Failed to load leaderboard");
+      setLoading(false);
       return;
     }
 
@@ -44,6 +47,7 @@ const LeaderboardPage = () => {
       }));
       setLeaderboard(entries);
     }
+    setLoading(false);
   };
 
   const handleBackToStart = () => {
@@ -56,7 +60,7 @@ const LeaderboardPage = () => {
       
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4 py-8">
         <div className="w-full max-w-2xl">
-          <Leaderboard entries={leaderboard} onBackToStart={handleBackToStart} />
+          <Leaderboard entries={leaderboard} loading={loading} onBackToStart={handleBackToStart} />
         </div>
       </div>
     </div>

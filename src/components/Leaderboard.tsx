@@ -1,6 +1,7 @@
 import { Trophy, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -14,10 +15,11 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
+  loading: boolean;
   onBackToStart: () => void;
 }
 
-export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
+export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProps) => {
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string } | null>(null);
   const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
 
@@ -36,7 +38,24 @@ export const Leaderboard = ({ entries, onBackToStart }: LeaderboardProps) => {
         </h2>
 
         <div className="w-full max-w-md space-y-3">
-          {sortedEntries.length === 0 ? (
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-4 bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-primary/20"
+              >
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <Skeleton className="w-16 h-16 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+                <Skeleton className="w-12 h-8 rounded" />
+              </div>
+            ))
+          ) : sortedEntries.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               No vibes checked yet. Be the first!
             </div>
