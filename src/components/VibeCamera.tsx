@@ -122,16 +122,30 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         return;
       }
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      // Calculate square crop dimensions
+      const squareSize = Math.min(video.videoWidth, video.videoHeight);
+      const offsetX = (video.videoWidth - squareSize) / 2;
+      const offsetY = (video.videoHeight - squareSize) / 2;
+
+      // Set canvas to fixed square size
+      const outputSize = 800;
+      canvas.width = outputSize;
+      canvas.height = outputSize;
 
       if (context) {
         // Flip the image for front camera
         if (facingMode === "user") {
-          context.translate(canvas.width, 0);
+          context.translate(outputSize, 0);
           context.scale(-1, 1);
         }
-        context.drawImage(video, 0, 0);
+        
+        // Draw the center square crop
+        context.drawImage(
+          video,
+          offsetX, offsetY, squareSize, squareSize, // source rectangle (center square)
+          0, 0, outputSize, outputSize // destination rectangle (full canvas)
+        );
+        
         const imageData = canvas.toDataURL("image/jpeg", 0.95);
         
         stopCamera();
@@ -188,6 +202,25 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
       
       {isStreaming && (
         <>
+          {/* Square crop overlay */}
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div className="relative" style={{ 
+              width: 'min(90vw, 90vh)', 
+              height: 'min(90vw, 90vh)',
+              maxWidth: '600px',
+              maxHeight: '600px'
+            }}>
+              {/* Corner guides */}
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+              
+              {/* Semi-transparent overlay outside the square */}
+              <div className="absolute inset-0 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"></div>
+            </div>
+          </div>
+
           {/* Top bar */}
           <div className="absolute top-0 left-0 right-0 z-20 safe-top">
             <div className="flex justify-between items-center p-4">

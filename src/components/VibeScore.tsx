@@ -56,11 +56,11 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
   return (
     <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
       {imageUrl && (
-        <div className="w-full max-w-md relative">
+        <div className="w-full max-w-md relative aspect-square">
           <img
             src={imageUrl}
             alt="Your vibe check"
-            className="w-full h-auto rounded-xl border-2 border-primary/30 shadow-glow"
+            className="w-full h-full object-cover rounded-xl border-2 border-primary/30 shadow-glow"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-background/90 via-background/50 to-transparent rounded-xl">
             <div className="text-center space-y-2">

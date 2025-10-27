@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+
 import vibeBotImage from "@/assets/vibe-bot.png";
 
 interface LeaderboardEntry {
@@ -27,28 +27,13 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProps) => {
-  const navigate = useNavigate();
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string; entryId: string } | null>(null);
   const [comments, setComments] = useState<Array<{ id: string; comment_text: string; commenter_name: string | null; created_at: string }>>([]);
   const [newComment, setNewComment] = useState("");
   const [commenterName, setCommenterName] = useState("");
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
-
-  useEffect(() => {
-    // Check auth status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const getMedalIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
@@ -77,17 +62,6 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
   const handleSubmitComment = async () => {
     if (!newComment.trim() || !selectedEntry) return;
 
-    // Check if user is authenticated
-    if (!user) {
-      toast({ 
-        title: "Sign in required", 
-        description: "Please sign in to comment",
-        variant: "destructive" 
-      });
-      navigate("/auth");
-      return;
-    }
-
     setSubmittingComment(true);
     const { error } = await supabase
       .from("comments")
@@ -95,7 +69,6 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
         leaderboard_entry_id: selectedEntry.entryId,
         comment_text: newComment.trim(),
         commenter_name: commenterName.trim() || null,
-        user_id: user.id,
       });
 
     if (error) {
@@ -201,11 +174,13 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           {selectedEntry && (
             <div className="flex flex-col gap-6">
-              <img
-                src={selectedEntry.imageUrl}
-                alt="Full size vibe check"
-                className="w-full max-h-[50vh] object-contain rounded-lg"
-              />
+              <div className="w-full aspect-square max-w-lg mx-auto">
+                <img
+                  src={selectedEntry.imageUrl}
+                  alt="Full size vibe check"
+                  className="w-full h-full object-cover rounded-lg border-2 border-primary/30"
+                />
+              </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold text-foreground">{selectedEntry.name}</h3>
