@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
 
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -91,6 +92,7 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
 
   return (
     <>
+      <NotificationPrompt />
       <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
         <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
           Vibe Leaderboard

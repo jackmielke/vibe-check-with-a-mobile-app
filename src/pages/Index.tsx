@@ -99,6 +99,16 @@ const Index = () => {
         return;
       }
 
+      // Send push notifications to all subscribers
+      try {
+        await supabase.functions.invoke('send-vibe-notification', {
+          body: { name, score: vibeScore }
+        });
+      } catch (notificationError) {
+        console.error("Error sending notifications:", notificationError);
+        // Don't fail the submission if notifications fail
+      }
+
       toast.success("Added to leaderboard!");
       navigate("/leaderboard");
     } catch (error) {
