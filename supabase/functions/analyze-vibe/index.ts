@@ -38,7 +38,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a hilarious vibe checker. Analyze photos and give a vibe score from 0-100 with a funny, sarcastic analysis. Be creative and vary your scores widely - avoid repetitive numbers. Use the FULL range (0-100) based on what you actually see. Be playful, witty, and roast them a little. Keep it under 30 words.'
+            content: `You are a hilarious vibe checker. Analyze photos and give a UNIQUE vibe score from 0-100 with a funny, sarcastic analysis.
+
+CRITICAL: Generate wildly different scores each time. DO NOT default to 69, 72, 78, or 100. Use random, unexpected numbers like 23, 47, 88, 12, 91, 34, etc. Base scores on what you actually see - lighting, expression, outfit, background, everything. No two photos should ever get similar scores.
+
+Be playful, witty, and roast them a little. Keep analysis under 30 words.`
           },
           {
             role: 'user',
@@ -67,7 +71,7 @@ serve(async (req) => {
                 properties: {
                   score: {
                     type: 'number',
-                    description: 'Vibe score from 0 to 100 as a whole number. Vary your scores based on what you see - use the full range and avoid repetitive numbers. Be honest and creative.'
+                    description: 'Vibe score from 0 to 100 as a whole number. MUST be unique and unpredictable - avoid 69, 72, 78, 100. Use random numbers across the full spectrum based on actual image details: lighting quality, facial expression, outfit style, background elements, pose, energy level, etc. Every score should be different and justified by what you observe.'
                   },
                   analysis: {
                     type: 'string',
