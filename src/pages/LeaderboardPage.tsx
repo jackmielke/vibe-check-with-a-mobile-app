@@ -20,6 +20,48 @@ const LeaderboardPage = () => {
 
   useEffect(() => {
     loadLeaderboard();
+
+    // Listen for new leaderboard entries
+    const channel = supabase
+      .channel('leaderboard-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'leaderboard'
+        },
+        (payload) => {
+          console.log('New vibe check posted:', payload);
+          
+          // Add the new entry to the leaderboard
+          const newEntry: LeaderboardEntry = {
+            id: payload.new.id,
+            name: payload.new.name,
+            score: payload.new.score,
+            timestamp: payload.new.created_at,
+            imageUrl: payload.new.image_url || undefined,
+            vibeAnalysis: payload.new.vibe_analysis || undefined,
+          };
+          
+          setLeaderboard(prev => [newEntry, ...prev]);
+
+          // Show notification if enabled
+          const notificationsEnabled = localStorage.getItem('notifications-enabled') === 'true';
+          if (notificationsEnabled && Notification.permission === 'granted') {
+            new Notification('🌟 New Vibe Check!', {
+              body: `${payload.new.name} just posted with a score of ${payload.new.score}%`,
+              icon: '/icon-192.png',
+              badge: '/icon-192.png',
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadLeaderboard = async () => {

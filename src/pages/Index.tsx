@@ -100,14 +100,7 @@ const Index = () => {
       }
 
       // Send push notifications to all subscribers
-      try {
-        await supabase.functions.invoke('send-vibe-notification', {
-          body: { name, score: vibeScore }
-        });
-      } catch (notificationError) {
-        console.error("Error sending notifications:", notificationError);
-        // Don't fail the submission if notifications fail
-      }
+      // Notifications are handled via realtime subscription on the leaderboard page
 
       toast.success("Added to leaderboard!");
       navigate("/leaderboard");

@@ -1,4 +1,4 @@
-import { Trophy, Medal, MessageCircle } from "lucide-react";
+import { Trophy, Medal, MessageCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { NotificationPrompt } from "@/components/NotificationPrompt";
+import { NotificationButton } from "@/components/NotificationButton";
 
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -92,11 +92,13 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
 
   return (
     <>
-      <NotificationPrompt />
       <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
-        <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-          Vibe Leaderboard
-        </h2>
+        <div className="flex items-center justify-between w-full max-w-md mb-2">
+          <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Vibe Leaderboard
+          </h2>
+          <NotificationButton />
+        </div>
 
         <div className="w-full max-w-md space-y-3">
           {loading ? (
