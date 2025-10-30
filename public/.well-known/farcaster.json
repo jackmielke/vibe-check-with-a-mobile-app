@@ -14,5 +14,10 @@
     "ogTitle": "Vibe Check - AI Vibe Scoring",
     "ogDescription": "Take a photo and get your vibe checked by our AI bot. Compete on the leaderboard!",
     "ogImageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjE0MjkzNTcsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg3M2M2Mzc0MDdhYzhGYWViNDYzNmFFNEI5QzY1ZGEwMGFiQkM5NjlEIn0",
+    "payload": "eyJkb21haW4iOiJ2aWJlLWNoZWNrLXdpdGgtYS5sb3ZhYmxlLmFwcCJ9",
+    "signature": "Z1pXOT9l1dY+F5YjKmPkADIcyWRP/i1aE1pCq0zBgs5+chDVAnWppDIlYU/d+2GwnWKDES/3b/+pGo4HoFxFUxw="
   }
 }
