@@ -4,16 +4,21 @@
     "name": "Vibe Check",
     "homeUrl": "https://vibe-check-with-a.lovable.app",
     "iconUrl": "https://vibe-check-with-a.lovable.app/icon-512.png",
+    "imageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png",
+    "buttonTitle": "Check My Vibe",
     "splashImageUrl": "https://vibe-check-with-a.lovable.app/icon-192.png",
     "splashBackgroundColor": "#1a0d29",
     "subtitle": "AI-powered vibe scoring",
     "description": "Take a photo and get your vibe checked by our AI bot. Find out your vibe score and compete on the leaderboard with friends!",
+    "screenshotUrls": ["https://vibe-check-with-a.lovable.app/icon-512.png"],
     "primaryCategory": "entertainment",
     "tags": ["ai", "camera", "leaderboard", "social", "fun"],
+    "heroImageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png",
     "tagline": "Get your vibe checked by AI",
     "ogTitle": "Vibe Check - AI Vibe Scoring",
     "ogDescription": "Take a photo and get your vibe checked by our AI bot. Compete on the leaderboard!",
-    "ogImageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png"
+    "ogImageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png",
+    "castShareUrl": "https://vibe-check-with-a.lovable.app"
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjE0MjkzNTcsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg3M2M2Mzc0MDdhYzhGYWViNDYzNmFFNEI5QzY1ZGEwMGFiQkM5NjlEIn0",
