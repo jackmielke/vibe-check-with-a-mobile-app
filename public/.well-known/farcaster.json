@@ -2,9 +2,9 @@
   "miniapp": {
     "version": "1",
     "name": "Vibe Check",
-    "homeUrl": "https://your-domain.lovable.app",
-    "iconUrl": "https://your-domain.lovable.app/icon-512.png",
-    "splashImageUrl": "https://your-domain.lovable.app/icon-192.png",
+    "homeUrl": "https://vibe-check-with-a.lovable.app",
+    "iconUrl": "https://vibe-check-with-a.lovable.app/icon-512.png",
+    "splashImageUrl": "https://vibe-check-with-a.lovable.app/icon-192.png",
     "splashBackgroundColor": "#1a0d29",
     "subtitle": "AI-powered vibe scoring",
     "description": "Take a photo and get your vibe checked by our AI bot. Find out your vibe score and compete on the leaderboard with friends!",
@@ -13,6 +13,6 @@
     "tagline": "Get your vibe checked by AI",
     "ogTitle": "Vibe Check - AI Vibe Scoring",
     "ogDescription": "Take a photo and get your vibe checked by our AI bot. Compete on the leaderboard!",
-    "ogImageUrl": "https://your-domain.lovable.app/icon-512.png"
+    "ogImageUrl": "https://vibe-check-with-a.lovable.app/icon-512.png"
   }
 }
