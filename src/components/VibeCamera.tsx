@@ -17,51 +17,15 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  const getStreamWithFallbacks = async (mode: "user" | "environment", mobile: boolean): Promise<MediaStream | null> => {
-    // Try with device-specific ideal resolution
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          facingMode: { ideal: mode },
-          width: { ideal: mobile ? 720 : 1920 },
-          height: { ideal: mobile ? 1280 : 1080 }
-        }
-      });
-      return stream;
-    } catch (error) {
-      console.warn("Failed with device-specific resolution:", error);
-    }
-
-    // Try with just facingMode
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: mode } }
-      });
-      return stream;
-    } catch (error) {
-      console.warn("Failed with facingMode:", error);
-    }
-
-    // Final fallback - any camera
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: true
-      });
-      return stream;
-    } catch (error) {
-      console.error("All camera attempts failed:", error);
-      return null;
-    }
-  };
-
   const startCamera = async () => {
     setShowPermissionPrompt(false);
     
     try {
-      const stream = await getStreamWithFallbacks(facingMode, isMobile);
+      // Simple camera request without resolution constraints
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode }
+      });
       
       if (!stream || !videoRef.current) {
         throw new Error("Failed to get camera stream");
@@ -122,31 +86,30 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         return;
       }
 
-      // Calculate square crop dimensions
+      // Simple center square crop
       const squareSize = Math.min(video.videoWidth, video.videoHeight);
       const offsetX = (video.videoWidth - squareSize) / 2;
       const offsetY = (video.videoHeight - squareSize) / 2;
 
-      // Set canvas to fixed square size
-      const outputSize = 800;
-      canvas.width = outputSize;
-      canvas.height = outputSize;
+      // Set canvas to square
+      canvas.width = squareSize;
+      canvas.height = squareSize;
 
       if (context) {
-        // Flip the image for front camera
+        // Mirror for front camera
         if (facingMode === "user") {
-          context.translate(outputSize, 0);
+          context.translate(squareSize, 0);
           context.scale(-1, 1);
         }
         
-        // Draw the center square crop
+        // Draw center square
         context.drawImage(
           video,
-          offsetX, offsetY, squareSize, squareSize, // source rectangle (center square)
-          0, 0, outputSize, outputSize // destination rectangle (full canvas)
+          offsetX, offsetY, squareSize, squareSize,
+          0, 0, squareSize, squareSize
         );
         
-        const imageData = canvas.toDataURL("image/jpeg", 0.95);
+        const imageData = canvas.toDataURL("image/jpeg", 0.9);
         
         stopCamera();
         onCapture(imageData);
@@ -186,15 +149,15 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
       height: '100vh',
       overflow: 'hidden'
     }}>
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-full flex items-center justify-center">
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="absolute inset-0 w-full h-full"
+          className="w-full h-full"
           style={{ 
-            objectFit: 'cover',
+            objectFit: 'contain',
             transform: facingMode === "user" ? "scaleX(-1)" : "none"
           }}
         />
@@ -202,22 +165,14 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
       
       {isStreaming && (
         <>
-          {/* Square crop overlay */}
+          {/* Simple center guide */}
           <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-            <div className="relative" style={{ 
-              width: 'min(90vw, 90vh)', 
-              height: 'min(90vw, 90vh)',
-              maxWidth: '600px',
-              maxHeight: '600px'
-            }}>
+            <div className="relative w-[80vmin] h-[80vmin] max-w-md max-h-md">
               {/* Corner guides */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
-              <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
-              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-lg"></div>
-              
-              {/* Semi-transparent overlay outside the square */}
-              <div className="absolute inset-0 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"></div>
+              <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white/80 rounded-tl-lg"></div>
+              <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white/80 rounded-tr-lg"></div>
+              <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white/80 rounded-bl-lg"></div>
+              <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white/80 rounded-br-lg"></div>
             </div>
           </div>
 
