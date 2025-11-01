@@ -5,10 +5,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { NotificationButton } from "@/components/NotificationButton";
+import type { TimeFilter } from "@/pages/LeaderboardPage";
 
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -25,9 +27,11 @@ interface LeaderboardProps {
   entries: LeaderboardEntry[];
   loading: boolean;
   onBackToStart: () => void;
+  timeFilter: TimeFilter;
+  onTimeFilterChange: (filter: TimeFilter) => void;
 }
 
-export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProps) => {
+export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTimeFilterChange }: LeaderboardProps) => {
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string; entryId: string } | null>(null);
   const [comments, setComments] = useState<Array<{ id: string; comment_text: string; commenter_name: string | null; created_at: string }>>([]);
   const [newComment, setNewComment] = useState("");
@@ -97,7 +101,20 @@ export const Leaderboard = ({ entries, loading, onBackToStart }: LeaderboardProp
           <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             Vibe Leaderboard
           </h2>
-          <NotificationButton />
+          <div className="flex items-center gap-2">
+            <Select value={timeFilter} onValueChange={onTimeFilterChange}>
+              <SelectTrigger className="w-[130px] h-9 bg-background/80 backdrop-blur-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">This Week</SelectItem>
+                <SelectItem value="month">This Month</SelectItem>
+                <SelectItem value="all">All Time</SelectItem>
+              </SelectContent>
+            </Select>
+            <NotificationButton />
+          </div>
         </div>
 
         <div className="w-full max-w-md space-y-3">

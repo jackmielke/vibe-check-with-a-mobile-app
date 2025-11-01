@@ -13,9 +13,12 @@ interface LeaderboardEntry {
   vibeAnalysis?: string;
 }
 
+export type TimeFilter = "today" | "week" | "month" | "all";
+
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,16 +55,38 @@ const LeaderboardPage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [timeFilter]);
 
   const loadLeaderboard = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    const now = new Date();
+    let dateFilter: Date | null = null;
+    
+    switch (timeFilter) {
+      case "today":
+        dateFilter = new Date(now.setHours(0, 0, 0, 0));
+        break;
+      case "week":
+        dateFilter = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case "month":
+        dateFilter = new Date(now.setMonth(now.getMonth() - 1));
+        break;
+    }
+    
+    let query = supabase
       .from("leaderboard")
       .select("*")
       .order("score", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(100);
+    
+    if (dateFilter) {
+      query = query.gte("created_at", dateFilter.toISOString());
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error("Error loading leaderboard:", error);
@@ -94,7 +119,13 @@ const LeaderboardPage = () => {
       
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4 py-8">
         <div className="w-full max-w-2xl">
-          <Leaderboard entries={leaderboard} loading={loading} onBackToStart={handleBackToStart} />
+          <Leaderboard 
+            entries={leaderboard} 
+            loading={loading} 
+            onBackToStart={handleBackToStart}
+            timeFilter={timeFilter}
+            onTimeFilterChange={setTimeFilter}
+          />
         </div>
       </div>
     </div>
