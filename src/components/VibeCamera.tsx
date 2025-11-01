@@ -20,6 +20,17 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const startCamera = async () => {
     setShowPermissionPrompt(false);
     
+    // Lock to portrait orientation on mobile
+    if ('orientation' in screen && 'lock' in (screen.orientation as any)) {
+      try {
+        await (screen.orientation as any).lock('portrait').catch(() => {
+          console.log('Orientation lock not supported');
+        });
+      } catch (e) {
+        console.log('Orientation lock failed');
+      }
+    }
+    
     try {
       // Simple camera request without resolution constraints
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -143,43 +154,33 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ 
+    <div className="fixed inset-0 bg-black z-50" style={{ 
       position: 'fixed',
+      top: 0,
+      left: 0,
       width: '100vw',
-      height: '100vh',
-      overflow: 'hidden'
+      height: '100dvh',
+      overflow: 'hidden',
+      touchAction: 'none'
     }}>
-      <div className="relative w-full h-full flex items-center justify-center">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full"
-          style={{ 
-            objectFit: 'contain',
-            transform: facingMode === "user" ? "scaleX(-1)" : "none"
-          }}
-        />
-      </div>
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="absolute inset-0 w-full h-full"
+        style={{ 
+          objectFit: 'cover',
+          transform: facingMode === "user" ? "scaleX(-1)" : "none"
+        }}
+      />
       
       {isStreaming && (
         <>
-          {/* Simple center guide */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-            <div className="relative w-[80vmin] h-[80vmin] max-w-md max-h-md">
-              {/* Corner guides */}
-              <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white/80 rounded-tl-lg"></div>
-              <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white/80 rounded-tr-lg"></div>
-              <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white/80 rounded-bl-lg"></div>
-              <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white/80 rounded-br-lg"></div>
-            </div>
-          </div>
 
-          {/* Top bar */}
-          <div className="absolute top-0 left-0 right-0 z-20 safe-top">
-            <div className="flex justify-between items-center p-4">
-              <div className="w-10" /> {/* Spacer for symmetry */}
+          {/* Top bar with flip camera */}
+          <div className="absolute top-0 left-0 right-0 z-20" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+            <div className="flex justify-end items-center p-4">
               <Button
                 onClick={flipCamera}
                 size="icon"
@@ -192,7 +193,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
           </div>
 
           {/* Bottom capture area */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 pb-8 safe-bottom">
+          <div className="absolute bottom-0 left-0 right-0 z-20" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
             <div className="flex justify-center items-center">
               <button
                 onClick={capturePhoto}
