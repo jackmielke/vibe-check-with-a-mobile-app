@@ -45,16 +45,6 @@ const LeaderboardPage = () => {
           };
           
           setLeaderboard(prev => [newEntry, ...prev]);
-
-          // Show notification if enabled
-          const notificationsEnabled = localStorage.getItem('notifications-enabled') === 'true';
-          if (notificationsEnabled && Notification.permission === 'granted') {
-            new Notification('🌟 New Vibe Check!', {
-              body: `${payload.new.name} just posted with a score of ${payload.new.score}%`,
-              icon: '/icon-192.png',
-              badge: '/icon-192.png',
-            });
-          }
         }
       )
       .subscribe();
