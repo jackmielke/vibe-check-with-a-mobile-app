@@ -72,9 +72,12 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   };
 
   const flipCamera = async () => {
+    const newFacingMode = facingMode === "user" ? "environment" : "user";
     stopCamera();
-    setFacingMode(prev => prev === "user" ? "environment" : "user");
-    setTimeout(() => startCamera(), 100);
+    setFacingMode(newFacingMode);
+    // Wait for cleanup before restarting with new facing mode
+    await new Promise(resolve => setTimeout(resolve, 300));
+    await startCamera();
   };
 
   useEffect(() => {
