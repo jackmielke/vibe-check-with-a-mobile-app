@@ -89,7 +89,12 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+
+    console.log('File selected:', file.name, file.type);
 
     if (!file.type.startsWith('image/')) {
       toast({
@@ -101,14 +106,42 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
     }
 
     const reader = new FileReader();
+    
+    reader.onerror = () => {
+      console.error('FileReader error');
+      toast({
+        title: "Error reading file",
+        description: "Failed to read the selected image",
+        variant: "destructive"
+      });
+    };
+
     reader.onload = (e) => {
+      console.log('File loaded, creating image');
       const img = new Image();
+      
+      img.onerror = () => {
+        console.error('Image load error');
+        toast({
+          title: "Error loading image",
+          description: "Failed to load the selected image",
+          variant: "destructive"
+        });
+      };
+
       img.onload = () => {
+        console.log('Image loaded, processing:', img.width, 'x', img.height);
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+          console.error('Canvas not found');
+          return;
+        }
 
         const context = canvas.getContext("2d");
-        if (!context) return;
+        if (!context) {
+          console.error('Canvas context not found');
+          return;
+        }
 
         // Create square crop
         const squareSize = Math.min(img.width, img.height);
@@ -125,11 +158,19 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         );
 
         const imageData = canvas.toDataURL("image/jpeg", 0.9);
-        stopCamera();
+        console.log('Image processed, calling onCapture with source: upload');
+        
+        // Stop camera if it's running
+        if (isStreaming) {
+          stopCamera();
+        }
+        
         onCapture(imageData, 'upload');
       };
+      
       img.src = e.target?.result as string;
     };
+    
     reader.readAsDataURL(file);
   };
 
