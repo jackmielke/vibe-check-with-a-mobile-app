@@ -11,13 +11,15 @@ type Screen = "welcome" | "camera" | "score";
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [photoSource, setPhotoSource] = useState<'camera' | 'upload'>('camera');
   const [vibeScore, setVibeScore] = useState<number>(0);
   const [vibeAnalysis, setVibeAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const navigate = useNavigate();
 
-  const handleCapture = async (imageData: string) => {
+  const handleCapture = async (imageData: string, source: 'camera' | 'upload') => {
     setCapturedImage(imageData);
+    setPhotoSource(source);
     setIsAnalyzing(true);
 
     try {
@@ -91,6 +93,7 @@ const Index = () => {
           score: vibeScore,
           vibe_analysis: vibeAnalysis,
           image_url: imageUrl,
+          photo_source: photoSource,
         });
 
       if (error) {

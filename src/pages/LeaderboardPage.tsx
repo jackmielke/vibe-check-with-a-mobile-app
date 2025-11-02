@@ -11,6 +11,7 @@ interface LeaderboardEntry {
   timestamp: string;
   imageUrl?: string;
   vibeAnalysis?: string;
+  photoSource?: 'camera' | 'upload';
 }
 
 export type TimeFilter = "today" | "week" | "month" | "all";
@@ -45,6 +46,9 @@ const LeaderboardPage = () => {
             timestamp: payload.new.created_at,
             imageUrl: payload.new.image_url || undefined,
             vibeAnalysis: payload.new.vibe_analysis || undefined,
+            photoSource: (payload.new.photo_source === 'camera' || payload.new.photo_source === 'upload') 
+              ? payload.new.photo_source 
+              : undefined,
           };
           
           setLeaderboard(prev => [newEntry, ...prev]);
@@ -103,6 +107,9 @@ const LeaderboardPage = () => {
         timestamp: entry.created_at,
         imageUrl: entry.image_url || undefined,
         vibeAnalysis: entry.vibe_analysis || undefined,
+        photoSource: (entry.photo_source === 'camera' || entry.photo_source === 'upload') 
+          ? entry.photo_source 
+          : undefined,
       }));
       setLeaderboard(entries);
     }

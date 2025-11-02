@@ -55,6 +55,7 @@ export type Database = {
           id: string
           image_url: string | null
           name: string
+          photo_source: string | null
           score: number
           vibe_analysis: string | null
         }
@@ -63,6 +64,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           name: string
+          photo_source?: string | null
           score: number
           vibe_analysis?: string | null
         }
@@ -71,6 +73,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           name?: string
+          photo_source?: string | null
           score?: number
           vibe_analysis?: string | null
         }
