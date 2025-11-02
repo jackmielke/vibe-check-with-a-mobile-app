@@ -98,24 +98,25 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
   return (
     <>
       <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
-        <div className="flex items-center justify-between w-full max-w-md mb-2">
-          <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Vibe Leaderboard
-          </h2>
-          <div className="flex items-center gap-2">
-            <Select value={timeFilter} onValueChange={onTimeFilterChange}>
-              <SelectTrigger className="w-[130px] h-9 bg-background/80 backdrop-blur-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="all">All Time</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="w-full max-w-md space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Vibe Leaderboard
+            </h2>
             <NotificationButton />
           </div>
+          
+          <Select value={timeFilter} onValueChange={onTimeFilterChange}>
+            <SelectTrigger className="w-full bg-background/80 backdrop-blur-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="w-full max-w-md space-y-3">
