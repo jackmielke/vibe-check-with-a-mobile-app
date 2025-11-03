@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -39,20 +39,6 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
   const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
-
-  const timeFilterOptions: TimeFilter[] = ["today", "week", "month", "all"];
-  const timeFilterLabels: Record<TimeFilter, string> = {
-    today: "Today",
-    week: "This Week",
-    month: "This Month",
-    all: "All Time"
-  };
-
-  const sliderValue = timeFilterOptions.indexOf(timeFilter);
-
-  const handleSliderChange = (value: number[]) => {
-    onTimeFilterChange(timeFilterOptions[value[0]]);
-  };
 
   const getMedalIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
@@ -119,29 +105,17 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
             <NotificationButton />
           </div>
           
-          <div className="space-y-2">
-            <div className="text-center">
-              <span className="text-lg font-semibold text-foreground">
-                {timeFilterLabels[timeFilter]}
-              </span>
-            </div>
-            <div className="px-2">
-              <Slider
-                value={[sliderValue]}
-                onValueChange={handleSliderChange}
-                min={0}
-                max={3}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                <span>Today</span>
-                <span>Week</span>
-                <span>Month</span>
-                <span>All</span>
-              </div>
-            </div>
-          </div>
+          <Select value={timeFilter} onValueChange={onTimeFilterChange}>
+            <SelectTrigger className="w-full bg-background/80 backdrop-blur-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="w-full max-w-md space-y-3">
