@@ -1,4 +1,4 @@
-import { Trophy, Medal, MessageCircle, ArrowLeft, Camera, Upload } from "lucide-react";
+import { Trophy, Medal, MessageCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,7 +21,6 @@ interface LeaderboardEntry {
   timestamp: string;
   imageUrl?: string;
   vibeAnalysis?: string;
-  photoSource?: 'camera' | 'upload';
 }
 
 interface LeaderboardProps {
@@ -168,15 +167,7 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-foreground">{entry.name}</p>
-                    {entry.photoSource && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">
-                        {entry.photoSource === 'camera' ? <Camera className="h-3 w-3" /> : <Upload className="h-3 w-3" />}
-                        {entry.photoSource === 'camera' ? 'Camera' : 'Upload'}
-                      </span>
-                    )}
-                  </div>
+                  <p className="font-semibold text-foreground">{entry.name}</p>
                   {entry.vibeAnalysis && (
                     <p className="text-sm text-muted-foreground italic line-clamp-2">
                       "{entry.vibeAnalysis}"

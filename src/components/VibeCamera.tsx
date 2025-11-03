@@ -1,25 +1,24 @@
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, RefreshCw, X, Upload } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VibeCameraProps {
-  onCapture: (imageData: string, source: 'camera' | 'upload') => void;
+  onCapture: (imageData: string) => void;
 }
 
 export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showPermissionPrompt, setShowPermissionPrompt] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
   const startCamera = async () => {
-    setShowPermissionPrompt(false);
+    setIsLoading(true);
     
     // Lock to portrait orientation on mobile
     if ('orientation' in screen && 'lock' in (screen.orientation as any)) {
@@ -52,6 +51,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
 
       await videoRef.current.play();
       setIsStreaming(true);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error accessing camera:", error);
       toast({
@@ -59,7 +59,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         description: "Unable to access camera. Please check permissions.",
         variant: "destructive"
       });
-      setShowPermissionPrompt(true);
+      setIsLoading(false);
     }
   };
 
@@ -82,97 +82,11 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
   };
 
   useEffect(() => {
+    startCamera();
     return () => {
       stopCamera();
     };
   }, []);
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.log('No file selected');
-      return;
-    }
-
-    console.log('File selected:', file.name, file.type);
-
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file",
-        description: "Please select an image file",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const reader = new FileReader();
-    
-    reader.onerror = () => {
-      console.error('FileReader error');
-      toast({
-        title: "Error reading file",
-        description: "Failed to read the selected image",
-        variant: "destructive"
-      });
-    };
-
-    reader.onload = (e) => {
-      console.log('File loaded, creating image');
-      const img = new Image();
-      
-      img.onerror = () => {
-        console.error('Image load error');
-        toast({
-          title: "Error loading image",
-          description: "Failed to load the selected image",
-          variant: "destructive"
-        });
-      };
-
-      img.onload = () => {
-        console.log('Image loaded, processing:', img.width, 'x', img.height);
-        const canvas = canvasRef.current;
-        if (!canvas) {
-          console.error('Canvas not found');
-          return;
-        }
-
-        const context = canvas.getContext("2d");
-        if (!context) {
-          console.error('Canvas context not found');
-          return;
-        }
-
-        // Create square crop
-        const squareSize = Math.min(img.width, img.height);
-        const offsetX = (img.width - squareSize) / 2;
-        const offsetY = (img.height - squareSize) / 2;
-
-        canvas.width = squareSize;
-        canvas.height = squareSize;
-
-        context.drawImage(
-          img,
-          offsetX, offsetY, squareSize, squareSize,
-          0, 0, squareSize, squareSize
-        );
-
-        const imageData = canvas.toDataURL("image/jpeg", 0.9);
-        console.log('Image processed, calling onCapture with source: upload');
-        
-        // Stop camera if it's running
-        if (isStreaming) {
-          stopCamera();
-        }
-        
-        onCapture(imageData, 'upload');
-      };
-      
-      img.src = e.target?.result as string;
-    };
-    
-    reader.readAsDataURL(file);
-  };
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
@@ -214,54 +128,10 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         const imageData = canvas.toDataURL("image/jpeg", 0.9);
         
         stopCamera();
-        onCapture(imageData, 'camera');
+        onCapture(imageData);
       }
     }
   };
-
-  if (showPermissionPrompt) {
-    return (
-      <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-6">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="w-20 h-20 mx-auto bg-gradient-primary rounded-full flex items-center justify-center">
-            <Camera className="w-10 h-10 text-primary-foreground" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">Choose Your Photo</h2>
-            <p className="text-muted-foreground">
-              Take a photo with your camera or upload one from your library
-            </p>
-          </div>
-          <div className="space-y-3">
-            <Button
-              onClick={startCamera}
-              size="lg"
-              className="bg-gradient-primary hover:opacity-90 transition-opacity w-full"
-            >
-              <Camera className="w-5 h-5 mr-2" />
-              Take Photo
-            </Button>
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              size="lg"
-              variant="outline"
-              className="w-full"
-            >
-              <Upload className="w-5 h-5 mr-2" />
-              Upload from Library
-            </Button>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed inset-0 bg-black z-50" style={{ 
@@ -304,15 +174,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
 
           {/* Bottom capture area */}
           <div className="absolute bottom-0 left-0 right-0 z-20" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
-            <div className="flex justify-center items-center gap-6">
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                size="icon"
-                variant="ghost"
-                className="bg-black/30 backdrop-blur-sm hover:bg-black/50 text-white border-none rounded-full w-14 h-14"
-              >
-                <Upload className="h-6 w-6" />
-              </Button>
+            <div className="flex justify-center items-center">
               <button
                 onClick={capturePhoto}
                 className="relative w-20 h-20 rounded-full border-[6px] border-white bg-transparent hover:scale-95 transition-transform active:scale-90"
@@ -321,18 +183,11 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
                 <div className="absolute inset-2 rounded-full bg-white"></div>
               </button>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
           </div>
         </>
       )}
 
-      {!isStreaming && (
+      {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto mb-4"></div>
