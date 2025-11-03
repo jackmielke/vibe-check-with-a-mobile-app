@@ -130,40 +130,38 @@ export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewM
               </TabsList>
             </Tabs>
             
-            {viewMode === "alltime" && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full shrink-0"
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    mode="single"
-                    selected={dateFilter || undefined}
-                    onSelect={(date) => onDateFilterChange(date || null)}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                  {dateFilter && (
-                    <div className="p-3 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => onDateFilterChange(null)}
-                      >
-                        Clear Filter
-                      </Button>
-                    </div>
-                  )}
-                </PopoverContent>
-              </Popover>
-            )}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full shrink-0"
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={dateFilter || undefined}
+                  onSelect={(date) => onDateFilterChange(date || null)}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+                {dateFilter && (
+                  <div className="p-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => onDateFilterChange(null)}
+                    >
+                      Clear Filter
+                    </Button>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 

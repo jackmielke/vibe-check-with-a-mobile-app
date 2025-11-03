@@ -66,8 +66,8 @@ const LeaderboardPage = () => {
       .select("*")
       .limit(100);
     
-    // Apply date filter if set (only for all-time view)
-    if (dateFilter && viewMode === "alltime") {
+    // Apply date filter if set
+    if (dateFilter) {
       const startOfDay = new Date(dateFilter);
       startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(dateFilter);
