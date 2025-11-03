@@ -145,6 +145,7 @@ export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewM
                   mode="single"
                   selected={dateFilter || undefined}
                   onSelect={(date) => onDateFilterChange(date || null)}
+                  disabled={(date) => date > new Date()}
                   initialFocus
                   className="pointer-events-auto"
                 />
