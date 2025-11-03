@@ -181,7 +181,16 @@ export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewM
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground/70">
-                    {new Date(entry.timestamp).toLocaleDateString()}
+                    {viewMode === "recent" 
+                      ? new Date(entry.timestamp).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      : new Date(entry.timestamp).toLocaleDateString()
+                    }
                   </p>
                 </div>
                 <div className="text-2xl font-bold text-primary shrink-0">{entry.score}</div>
