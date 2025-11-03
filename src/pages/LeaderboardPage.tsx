@@ -18,7 +18,7 @@ export type TimeFilter = "today" | "week" | "month" | "all";
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
   const navigate = useNavigate();
 
   useEffect(() => {
