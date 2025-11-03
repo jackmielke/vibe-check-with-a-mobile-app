@@ -19,6 +19,7 @@ const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("recent");
+  const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,15 +56,29 @@ const LeaderboardPage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [dateFilter, viewMode]);
 
   const loadLeaderboard = async () => {
     setLoading(true);
     
-    const { data, error } = await supabase
+    let query = supabase
       .from("leaderboard")
       .select("*")
       .limit(100);
+    
+    // Apply date filter if set (only for all-time view)
+    if (dateFilter && viewMode === "alltime") {
+      const startOfDay = new Date(dateFilter);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(dateFilter);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      query = query
+        .gte("created_at", startOfDay.toISOString())
+        .lte("created_at", endOfDay.toISOString());
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error("Error loading leaderboard:", error);
@@ -102,6 +117,8 @@ const LeaderboardPage = () => {
             onBackToStart={handleBackToStart}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            dateFilter={dateFilter}
+            onDateFilterChange={setDateFilter}
           />
         </div>
       </div>

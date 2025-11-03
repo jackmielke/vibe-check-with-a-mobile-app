@@ -1,4 +1,4 @@
-import { Trophy, Medal, MessageCircle } from "lucide-react";
+import { Trophy, Medal, MessageCircle, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { NotificationButton } from "@/components/NotificationButton";
 import type { ViewMode } from "@/pages/LeaderboardPage";
+import { format } from "date-fns";
 
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -29,9 +32,11 @@ interface LeaderboardProps {
   onBackToStart: () => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  dateFilter: Date | null;
+  onDateFilterChange: (date: Date | null) => void;
 }
 
-export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewModeChange }: LeaderboardProps) => {
+export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewModeChange, dateFilter, onDateFilterChange }: LeaderboardProps) => {
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string; entryId: string } | null>(null);
   const [comments, setComments] = useState<Array<{ id: string; comment_text: string; commenter_name: string | null; created_at: string }>>([]);
   const [newComment, setNewComment] = useState("");
@@ -113,16 +118,53 @@ export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewM
             <NotificationButton />
           </div>
           
-          <Tabs value={viewMode} onValueChange={(value) => onViewModeChange(value as ViewMode)} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="recent" className="transition-all">
-                Most Recent
-              </TabsTrigger>
-              <TabsTrigger value="alltime" className="transition-all">
-                All-Time
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <Tabs value={viewMode} onValueChange={(value) => onViewModeChange(value as ViewMode)} className="flex-1">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="recent" className="transition-all">
+                  Most Recent
+                </TabsTrigger>
+                <TabsTrigger value="alltime" className="transition-all">
+                  All-Time
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            
+            {viewMode === "alltime" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full shrink-0"
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateFilter || undefined}
+                    onSelect={(date) => onDateFilterChange(date || null)}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                  {dateFilter && (
+                    <div className="p-3 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => onDateFilterChange(null)}
+                      >
+                        Clear Filter
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
         </div>
 
         <div className="w-full max-w-md space-y-3">
