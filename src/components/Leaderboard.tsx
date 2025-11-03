@@ -1,16 +1,16 @@
-import { Trophy, Medal, MessageCircle, ArrowLeft } from "lucide-react";
+import { Trophy, Medal, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { NotificationButton } from "@/components/NotificationButton";
-import type { TimeFilter } from "@/pages/LeaderboardPage";
+import type { ViewMode } from "@/pages/LeaderboardPage";
 
 import vibeBotImage from "@/assets/vibe-bot.png";
 
@@ -27,18 +27,26 @@ interface LeaderboardProps {
   entries: LeaderboardEntry[];
   loading: boolean;
   onBackToStart: () => void;
-  timeFilter: TimeFilter;
-  onTimeFilterChange: (filter: TimeFilter) => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
-export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTimeFilterChange }: LeaderboardProps) => {
+export const Leaderboard = ({ entries, loading, onBackToStart, viewMode, onViewModeChange }: LeaderboardProps) => {
   const [selectedEntry, setSelectedEntry] = useState<{ imageUrl: string; name: string; score: number; analysis: string; entryId: string } | null>(null);
   const [comments, setComments] = useState<Array<{ id: string; comment_text: string; commenter_name: string | null; created_at: string }>>([]);
   const [newComment, setNewComment] = useState("");
   const [commenterName, setCommenterName] = useState("");
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
-  const sortedEntries = [...entries].sort((a, b) => b.score - a.score);
+  
+  // Sort entries based on view mode
+  const sortedEntries = [...entries].sort((a, b) => {
+    if (viewMode === "recent") {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    } else {
+      return b.score - a.score;
+    }
+  });
 
   const getMedalIcon = (index: number) => {
     if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
@@ -97,7 +105,7 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
   return (
     <>
       <div className="flex flex-col items-center gap-6 w-full animate-slide-up">
-        <div className="w-full max-w-md space-y-3">
+        <div className="w-full max-w-md space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Vibe Leaderboard
@@ -105,17 +113,16 @@ export const Leaderboard = ({ entries, loading, onBackToStart, timeFilter, onTim
             <NotificationButton />
           </div>
           
-          <Select value={timeFilter} onValueChange={onTimeFilterChange}>
-            <SelectTrigger className="w-full bg-background/80 backdrop-blur-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="all">All Time</SelectItem>
-            </SelectContent>
-          </Select>
+          <Tabs value={viewMode} onValueChange={(value) => onViewModeChange(value as ViewMode)} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="recent" className="transition-all">
+                Most Recent
+              </TabsTrigger>
+              <TabsTrigger value="alltime" className="transition-all">
+                All-Time
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         <div className="w-full max-w-md space-y-3">

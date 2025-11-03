@@ -13,12 +13,12 @@ interface LeaderboardEntry {
   vibeAnalysis?: string;
 }
 
-export type TimeFilter = "today" | "week" | "month" | "all";
+export type ViewMode = "recent" | "alltime";
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("recent");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,38 +55,15 @@ const LeaderboardPage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [timeFilter]);
+  }, []);
 
   const loadLeaderboard = async () => {
     setLoading(true);
     
-    const now = new Date();
-    let dateFilter: Date | null = null;
-    
-    switch (timeFilter) {
-      case "today":
-        dateFilter = new Date(now.setHours(0, 0, 0, 0));
-        break;
-      case "week":
-        dateFilter = new Date(now.setDate(now.getDate() - 7));
-        break;
-      case "month":
-        dateFilter = new Date(now.setMonth(now.getMonth() - 1));
-        break;
-    }
-    
-    let query = supabase
+    const { data, error } = await supabase
       .from("leaderboard")
       .select("*")
-      .order("score", { ascending: false })
-      .order("created_at", { ascending: false })
       .limit(100);
-    
-    if (dateFilter) {
-      query = query.gte("created_at", dateFilter.toISOString());
-    }
-    
-    const { data, error } = await query;
 
     if (error) {
       console.error("Error loading leaderboard:", error);
@@ -123,8 +100,8 @@ const LeaderboardPage = () => {
             entries={leaderboard} 
             loading={loading} 
             onBackToStart={handleBackToStart}
-            timeFilter={timeFilter}
-            onTimeFilterChange={setTimeFilter}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         </div>
       </div>
