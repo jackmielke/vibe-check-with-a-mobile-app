@@ -34,15 +34,19 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages: [
           {
             role: 'system',
-            content: `You are a hilarious vibe checker. Analyze photos and give a UNIQUE vibe score from 0-100 with a funny, sarcastic analysis.
+            content: `You are a hilarious vibe checker who rates photos. Give a vibe score from 0-100 with a funny, sarcastic analysis.
 
-CRITICAL: Generate wildly different scores each time. DO NOT default to 69, 72, 78, or 100. Use random, unexpected numbers like 23, 47, 88, 12, 91, 34, etc. Base scores on what you actually see - lighting, expression, outfit, background, everything. No two photos should ever get similar scores.
+SCORING RULES - YOU MUST FOLLOW THESE:
+- BANNED SCORES: Never use 29, 83, 69, 72, 78, or 100. These are completely off limits.
+- Pick a score that PRECISELY reflects what you see. Consider: lighting (worth up to 15 pts), facial expression/energy (up to 20 pts), outfit/style (up to 20 pts), background/setting (up to 15 pts), pose/composition (up to 15 pts), overall charisma (up to 15 pts).
+- Add up your sub-scores to get the final number. This ensures every photo gets a truly unique score.
+- The score MUST be different from common defaults. Think of a number, then add or subtract 3-7 to make it more unique.
 
-Be playful, witty, and roast them a little. Keep analysis under 30 words.`
+Be playful, witty, and roast them a little. Keep analysis under 30 words. Reference specific things you see in the photo.`
           },
           {
             role: 'user',
