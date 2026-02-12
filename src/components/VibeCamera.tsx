@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { playShutter } from "@/lib/sfx";
 
 interface VibeCameraProps {
   onCapture: (imageData: string) => void;
@@ -127,6 +128,7 @@ export const VibeCamera = ({ onCapture }: VibeCameraProps) => {
         
         const imageData = canvas.toDataURL("image/jpeg", 0.9);
         
+        playShutter();
         stopCamera();
         onCapture(imageData);
       }

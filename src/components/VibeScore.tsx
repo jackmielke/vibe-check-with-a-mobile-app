@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles } from "lucide-react";
+import { playScoreSound, playTap } from "@/lib/sfx";
 
 interface VibeScoreProps {
   score: number;
@@ -16,6 +17,9 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
   const [displayScore, setDisplayScore] = useState(0);
 
   useEffect(() => {
+    // Play score sound on mount
+    playScoreSound(score);
+
     // Animate the score counting up
     const duration = 2000;
     const steps = 60;
@@ -93,7 +97,7 @@ export const VibeScore = ({ score, analysis, imageUrl, onSubmit, onRetry }: Vibe
         <div className="flex gap-3">
           <Button
             type="button"
-            onClick={onRetry}
+            onClick={() => { playTap(); onRetry(); }}
             variant="outline"
             className="flex-1 border-primary/30 hover:bg-primary/10"
           >
