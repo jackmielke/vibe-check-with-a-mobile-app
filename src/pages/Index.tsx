@@ -5,6 +5,7 @@ import { VibeScore } from "@/components/VibeScore";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { playTap, playSuccess } from "@/lib/sfx";
 
 type Screen = "welcome" | "camera" | "score";
 
@@ -102,6 +103,7 @@ const Index = () => {
       // Send push notifications to all subscribers
       // Notifications are handled via realtime subscription on the leaderboard page
 
+      playSuccess();
       toast.success("Added to leaderboard!");
       navigate("/leaderboard");
     } catch (error) {
@@ -147,13 +149,13 @@ const Index = () => {
             </div>
             <div className="flex flex-col gap-4">
               <button
-                onClick={() => setScreen("camera")}
+                onClick={() => { playTap(); setScreen("camera"); }}
                 className="text-xl px-8 py-4 bg-gradient-primary hover:opacity-90 transition-all rounded-full font-semibold text-primary-foreground shadow-strong hover:shadow-glow hover:scale-105"
               >
                 Start Vibe Check
               </button>
               <button
-                onClick={() => navigate("/leaderboard")}
+                onClick={() => { playTap(); navigate("/leaderboard"); }}
                 className="text-lg px-6 py-3 bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all rounded-full font-semibold text-foreground hover:scale-105"
               >
                 View Leaderboard
