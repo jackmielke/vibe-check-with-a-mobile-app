@@ -49,6 +49,42 @@ export type Database = {
           },
         ]
       }
+      high_checks: {
+        Row: {
+          created_at: string
+          dosage: string | null
+          eye_analysis: string | null
+          id: string
+          image_url: string | null
+          name: string
+          score: number
+          snoop_quote: string | null
+          state: string | null
+        }
+        Insert: {
+          created_at?: string
+          dosage?: string | null
+          eye_analysis?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          score: number
+          snoop_quote?: string | null
+          state?: string | null
+        }
+        Update: {
+          created_at?: string
+          dosage?: string | null
+          eye_analysis?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          score?: number
+          snoop_quote?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
       leaderboard: {
         Row: {
           created_at: string
