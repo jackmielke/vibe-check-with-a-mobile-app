@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import vibeBotImage from "@/assets/vibe-bot.png";
 import { VibeCamera } from "@/components/VibeCamera";
 import { VibeScore } from "@/components/VibeScore";
@@ -16,6 +16,18 @@ const Index = () => {
   const [vibeAnalysis, setVibeAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const navigate = useNavigate();
+  const tapsRef = useRef<number[]>([]);
+
+  const handleSecretTap = () => {
+    const now = Date.now();
+    tapsRef.current = [...tapsRef.current, now].filter((t) => now - t < 2000);
+    if (tapsRef.current.length >= 4) {
+      tapsRef.current = [];
+      playTap();
+      toast.success("🌿 Snoop mode unlocked");
+      setTimeout(() => navigate("/high"), 400);
+    }
+  };
 
   const handleCapture = async (imageData: string) => {
     setCapturedImage(imageData);
@@ -137,6 +149,7 @@ const Index = () => {
             <img
               src={vibeBotImage}
               alt="Vibe Check Bot"
+              onClick={handleSecretTap}
               className="w-64 h-64 rounded-full object-cover border-4 border-primary shadow-glow animate-pulse-glow"
             />
             <div className="text-center space-y-4">

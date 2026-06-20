@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.submit-vibe]
 verify_jwt = false
+
+[functions.analyze-high]
+verify_jwt = false

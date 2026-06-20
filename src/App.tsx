@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import Auth from "./pages/Auth";
+import HighPage from "./pages/HighPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/high" element={<HighPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
