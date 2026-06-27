@@ -64,7 +64,8 @@ const LeaderboardPage = () => {
     let query = supabase
       .from("leaderboard")
       .select("*")
-      .limit(100);
+      .order("created_at", { ascending: false })
+      .limit(1000);
     
     // Apply date filter if set
     if (dateFilter) {
