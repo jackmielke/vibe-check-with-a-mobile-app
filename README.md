@@ -60,6 +60,11 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Is there a mobile app?
+
+Yes — the app is wrapped with Capacitor for iOS. See [MOBILE.md](./MOBILE.md) for
+how to build it, run it on your phone, and push it to TestFlight / the App Store.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/6e603d6c-a019-451b-8ef2-78d84822836b) and click on Share -> Publish.
