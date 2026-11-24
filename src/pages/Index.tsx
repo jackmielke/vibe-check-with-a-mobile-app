@@ -139,11 +139,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="fixed inset-0 bg-background overflow-y-auto">
       {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl animate-pulse-glow" />
-      
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl animate-pulse-glow pointer-events-none" />
+
+      <div className="relative z-10 min-h-full flex items-center justify-center p-4 py-8">
+        <div className="w-full max-w-2xl">
         {screen === "welcome" && (
           <div className="flex flex-col items-center gap-8 animate-scale-in">
             <img
@@ -205,6 +206,7 @@ const Index = () => {
             onRetry={handleRetry}
           />
         )}
+        </div>
       </div>
     </div>
   );
